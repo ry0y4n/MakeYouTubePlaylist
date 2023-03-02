@@ -67,7 +67,7 @@ print("get list of videos")
 while True:
   video_list_response = youtube.search().list(
     part="id,snippet",
-    channelId="UCTQpv70KPMZ-YWGuWBC-TqA",
+    channelId="チャンネルID",
     order="date",
     maxResults=5,
     pageToken=nextPageToken
@@ -87,7 +87,7 @@ for videoId in videoIds:
         part="snippet,status",
         body=dict(
             snippet=dict(
-            playlistId="PLikXBwz5Lef7BpLZAZHEgmyLBMagxW5Xa",
+            playlistId="プレイリストID",
             resourceId=dict(
                 kind="youtube#video",
                 videoId=videoId
