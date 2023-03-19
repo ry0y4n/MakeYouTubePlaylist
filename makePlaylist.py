@@ -60,40 +60,78 @@ if credentials is None or credentials.invalid:
 youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
   http=credentials.authorize(httplib2.Http()))
 
-nextPageToken = ""
-videoIds = []
+# print("get playlist items")
 
-print("get list of videos")
+# playlist_items = youtube.playlistItems().list(
+#   part="id, snippet, contentDetails, contentDetails",
+#   playlistId="PLikXBwz5Lef7BpLZAZHEgmyLBMagxW5Xa"
+# ).execute()
+
+# print(json.dumps(playlist_items, indent=2))
+
+channelId = "UCTQpv70KPMZ-YWGuWBC-TqA"
+playlistId = "PLikXBwz5Lef7BpLZAZHEgmyLBMagxW5Xa"
+
+nextPageToken = None
+channelVideos = []
+
+print("get channel's videos")
 while True:
   video_list_response = youtube.search().list(
-    part="id,snippet",
-    channelId="チャンネルID",
+    part="id, snippet",
+    channelId=channelId,
     order="date",
-    maxResults=5,
+    maxResults=50,
     pageToken=nextPageToken
   ).execute()
 
   for item in video_list_response["items"]:
     if item["id"]["kind"] == "youtube#video" and not "#shorts" in item["snippet"]["title"]:
-      videoIds.append(item["id"]["videoId"])
+      channelVideos.append(item["id"]["videoId"])
 
   nextPageToken = video_list_response.get("nextPageToken")
   if nextPageToken == None:
     break;
 
-print("insert videos")
-for videoId in videoIds:
-    video_insert_response = youtube.playlistItems().insert(
-        part="snippet,status",
-        body=dict(
-            snippet=dict(
-            playlistId="プレイリストID",
-            resourceId=dict(
-                kind="youtube#video",
-                videoId=videoId
-                )
-            )
-        )
-    ).execute()
+print("get playlist's videos")
+playlistVideos = []
+nextPageToken = None
 
-print("completed")
+while True:
+    request = youtube.playlistItems().list(
+        part="snippet",
+        maxResults=50,
+        playlistId=playlistId,
+        pageToken=nextPageToken
+    )
+    response = request.execute()
+
+    for item in response['items']:
+        playlistVideos.append(item['snippet']['resourceId']['videoId'])
+
+    nextPageToken = response.get('nextPageToken')
+
+    if nextPageToken is None:
+        break
+
+print("add video to playlist")
+new_videos = list(set(channelVideos) - set(playlistVideos))
+new_videos.reverse()
+
+for video_id in new_videos:
+    request = youtube.playlistItems().insert(
+        part="snippet",
+        body={
+          "snippet": {
+            "playlistId": playlistId,
+            "position": 0,
+            "resourceId": {
+              "kind": "youtube#video",
+              "videoId": video_id
+            }
+          }
+        }
+    )
+    response = request.execute()
+
+print("New videos added to the playlist!")
