@@ -60,15 +60,6 @@ if credentials is None or credentials.invalid:
 youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
   http=credentials.authorize(httplib2.Http()))
 
-# print("get playlist items")
-
-# playlist_items = youtube.playlistItems().list(
-#   part="id, snippet, contentDetails, contentDetails",
-#   playlistId="PLikXBwz5Lef7BpLZAZHEgmyLBMagxW5Xa"
-# ).execute()
-
-# print(json.dumps(playlist_items, indent=2))
-
 channelId = "UCTQpv70KPMZ-YWGuWBC-TqA"
 playlistId = "PLikXBwz5Lef7BpLZAZHEgmyLBMagxW5Xa"
 
