@@ -63,6 +63,21 @@ youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
 channelId = "UCTQpv70KPMZ-YWGuWBC-TqA"
 playlistId = "PLikXBwz5Lef7BpLZAZHEgmyLBMagxW5Xa"
 
+if not playlistId:
+  playlists_insert_response = youtube.playlists().insert(
+    part="snippet,status",
+    body=dict(
+      snippet=dict(
+        title="Test Playlist",
+        description="A private playlist created with the YouTube API v3"
+      ),
+      status=dict(
+        privacyStatus="private"
+      )
+    )
+  ).execute()
+  playlistId = playlists_insert_response["id"]
+
 nextPageToken = None
 channelVideos = []
 
